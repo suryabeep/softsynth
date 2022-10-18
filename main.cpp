@@ -22,24 +22,23 @@ int main() {
     Sequencer sequencer{
         "C4", "E4", "G4", "C5",
     };
-    VCO vco{WaveShape::SINE};
-    VCF vcf{0, 3};
+    VCO vco{WaveShape::SAW};
+    VCF vcf{0, 0.5};
     VCA vca{2000};
-    Envelope envelope{1, 1, 1};
+    Envelope envelope{0.3, 0.3, 0.5};
     Speaker speaker;
     Keyboard keys;
     Delay delay{0.5f, 0.5f, DelayMode::PING_PONG};
 
     // Routing signals using Wire objects
     Wire wires[]{
-        // {sequencer.clock_in, clock.square_out},
         {envelope.gate_in,   keys.gate_out},
         {vco.frequency,      keys.frequency_out},
-        {vca.audio_in,       envelope.amplitude_out},
-        {vcf.cutoff,         vca.audio_out},
-        {vcf.envelope,       envelope.amplitude_out},
         {vcf.audio_in,       vco.audio_out},
-        {delay.audio_in,     vcf.lowpass_out},
+        {vcf.contour,        envelope.amplitude_out},
+        {vca.audio_in,       vcf.audio_out},
+        {vca.amplitude,      envelope.amplitude_out},
+        {delay.audio_in,     vca.audio_out},
         {speaker.left_in,    delay.audio_out_left},
         {speaker.right_in,   delay.audio_out_right},
     };
