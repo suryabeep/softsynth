@@ -23,9 +23,9 @@ int main() {
         "C4", "E4", "G4", "C5",
     };
     VCO vco{WaveShape::SAW};
-    VCF vcf{0, 0.5};
+    VCF vcf{0.1, 0.5, LOWPASS, TWO_POLE};
     VCA vca{2000};
-    Envelope envelope{0.3, 0.3, 0.5};
+    Envelope envelope{1, 0.1, 0.1};
     Speaker speaker;
     Keyboard keys;
     Delay delay{0.5f, 0.5f, DelayMode::PING_PONG};
@@ -38,9 +38,9 @@ int main() {
         {vcf.contour,        envelope.amplitude_out},
         {vca.audio_in,       vcf.audio_out},
         {vca.amplitude,      envelope.amplitude_out},
-        {delay.audio_in,     vca.audio_out},
-        {speaker.left_in,    delay.audio_out_left},
-        {speaker.right_in,   delay.audio_out_right},
+        // {delay.audio_in,     vca.audio_out},
+        {speaker.left_in,    vcf.audio_out},
+        {speaker.right_in,   vcf.audio_out},
     };
 
     fprintf(stderr, "Press q to quit\n");

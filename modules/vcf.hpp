@@ -40,8 +40,8 @@ class VCF: public Module {
             : cutoff(cutoff), resonance(resonance), mode(modeIn), type(typeIn) {}
         void update();
 
-        float buf0{};
-        float buf1{};
+        float out0, out1, out2, out3, out4;  //filter buffers (beware denormals!)
+        float in0, in1, in2, in3, in4;  //filter buffers (beware denormals!)
         float audio_out{};
 };
 
