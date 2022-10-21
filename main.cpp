@@ -5,6 +5,7 @@
 #include "modules/delay.hpp"
 #include "modules/sequencer.hpp"
 #include "modules/keyboard.hpp"
+#include "modules/mixer.hpp"
 
 #include <iostream>
 
@@ -22,10 +23,18 @@ int main() {
     Sequencer sequencer{
         "C4", "E4", "G4", "C5",
     };
-    VCO vco{WaveShape::SAW};
-    VCF vcf{0.1, 0.5, LOWPASS, TWO_POLE};
-    VCA vca{2000};
-    Envelope envelope{1, 0.1, 0.1};
+    VCO vco1{WaveShape::SAW};
+    VCO vco2{WaveShape::SAW};
+    vco2.octaveShift = log2(1.5);
+    Mixer mixer;
+    mixer.audio_ins = std::vector<float> {0.5, 0.5};
+    mixer.weights = std::vector<float> {0.5, 0.5};
+
+    VCF vcf1{0.1, 0.5, LOWPASS, FOUR_POLE};
+    VCF vcf2{0.1, 0.5, LOWPASS, FOUR_POLE};
+    VCA vca1{2000};
+    VCA vca2{2000};
+    Envelope envelope{0.1, 1, 1};
     Speaker speaker;
     Keyboard keys;
     Delay delay{0.5f, 0.5f, DelayMode::PING_PONG};
@@ -33,14 +42,24 @@ int main() {
     // Routing signals using Wire objects
     Wire wires[]{
         {envelope.gate_in,   keys.gate_out},
-        {vco.frequency,      keys.frequency_out},
-        {vcf.audio_in,       vco.audio_out},
-        {vcf.contour,        envelope.amplitude_out},
-        {vca.audio_in,       vcf.audio_out},
-        {vca.amplitude,      envelope.amplitude_out},
+        {vco1.frequency,      keys.frequency_out},
+        {vco2.frequency,      keys.frequency_out},
+        {vcf1.audio_in,       vco1.audio_out},
+        {vcf2.audio_in,       vco2.audio_out},
+        {vcf1.contour,        envelope.amplitude_out},
+        {vcf2.contour,        envelope.amplitude_out},
+        {vca1.audio_in,       vcf1.audio_out},
+        {vca2.audio_in,       vcf2.audio_out},
+        {vca1.amplitude,      envelope.amplitude_out},
+        {vca2.amplitude,      envelope.amplitude_out},
         // {delay.audio_in,     vca.audio_out},
-        {speaker.left_in,    vcf.audio_out},
-        {speaker.right_in,   vcf.audio_out},
+        // {speaker.left_in,    vcf.audio_out},
+        // {speaker.right_in,   vcf.audio_out},
+        {mixer.audio_ins[0], vca1.audio_out},
+        {mixer.audio_ins[1], vca2.audio_out},
+        {speaker.left_in,    mixer.audio_out},
+        {speaker.right_in,   mixer.audio_out},
+
     };
 
     fprintf(stderr, "Press q to quit\n");

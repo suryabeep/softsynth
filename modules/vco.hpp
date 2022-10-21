@@ -22,6 +22,7 @@ class VCO: public Module
         float audio_out{};
         float currentPhase{};   // should be between 0 and 2*PI.
         float pulseWidth{};
+        float octaveShift{0};   // octaves up or down from the fundamental frequency
 
         VCO() = default;
         VCO(float frequencyIn, WaveShape shapeIn, float pulseWidthIn)

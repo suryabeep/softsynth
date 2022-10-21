@@ -4,6 +4,7 @@
 namespace ModSynth
 {
     void VCO::update() {
+        frequency = frequency / pow(2, octaveShift);
         float phaseIncrement = frequency * dt;
         if (shape == WaveShape::SINE)
         {
