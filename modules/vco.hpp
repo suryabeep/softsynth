@@ -25,6 +25,7 @@ class VCO: public Module
         float octaveShift{0};   // octaves up or down from the fundamental frequency
 
         VCO() = default;
+        VCO(int bpm);
         VCO(float frequencyIn, WaveShape shapeIn, float pulseWidthIn)
             : frequency(frequencyIn), shape(shapeIn), pulseWidth(pulseWidthIn) {};
         VCO(WaveShape shapeIn, float pulseWidthIn)

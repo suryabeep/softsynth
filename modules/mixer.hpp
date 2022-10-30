@@ -15,6 +15,7 @@ class Mixer: public Module {
 
         // Audio output
         Mixer() = default;
+        Mixer(std::initializer_list<float> weightsIn);
         void update();
 };
 

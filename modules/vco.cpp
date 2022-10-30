@@ -3,8 +3,14 @@
 
 namespace ModSynth
 {
+    VCO::VCO(int bpm)
+    {
+        // BPM to Hz conversion
+        frequency = bpm / 60.0f;
+    }
+
     void VCO::update() {
-        frequency = frequency / pow(2, octaveShift);
+        frequency = frequency * pow(2, octaveShift);
         float phaseIncrement = frequency * dt;
         if (shape == WaveShape::SINE)
         {

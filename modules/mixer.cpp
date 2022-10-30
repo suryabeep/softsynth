@@ -2,18 +2,17 @@
 
 namespace ModSynth
 {
-
+Mixer::Mixer(std::initializer_list<float> weightsIn)
+{
+    audio_ins.resize(weightsIn.size());
+    weights = std::move(weightsIn);
+}
 void Mixer::update()
 {
-    float total_weights = 0;
-    for (int i = 0; i < weights.size() && i < audio_ins.size(); i++)
-    {
-        total_weights += weights[i];
-    }
     float accum = 0;
     for (int i = 0; i < weights.size() && i < audio_ins.size(); i++)
     {
-        accum += weights[i] * audio_ins[i] / total_weights;
+        accum += weights[i] * audio_ins[i];
     }
     audio_out = accum;
 }
