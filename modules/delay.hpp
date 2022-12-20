@@ -14,21 +14,26 @@ enum DelayMode
 
 class Delay: public Module {
     public:
-        float audio_in{};
+        float audio_in_left{};
+        float audio_in_right{};
         float audio_out_left{};
         float audio_out_right{};
+
+        float prevSampleLeft{};
+        float prevSampleRight{};
+
         float delay_time{};
         float feedback{};
-        float prev_sample{};
-        bool  leftOrRight{false};
+        float mix{};
+        float stereo_ratio{1.0f};
+
         DelayMode mode{};
 
-        std::deque<float> delayLine;
-        Delay() = default;
-        Delay(float delayTimeIn, float feedbackIn)
-            : delay_time(delayTimeIn), feedback(feedbackIn) {};
-        Delay(float delayTimeIn, float feedbackIn, DelayMode modeIn)
-            : delay_time(delayTimeIn), feedback(feedbackIn), mode(modeIn) {};
+        std::deque<float> delayLineLeft;
+        std::deque<float> delayLineRight;
+        Delay();
+        Delay(float delayTimeIn, float feedbackIn, float mixIn);
+        Delay(float delayTimeIn, float feedbackIn, float mixIn, DelayMode modeIn);
         void update();
 };
 

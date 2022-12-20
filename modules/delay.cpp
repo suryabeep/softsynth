@@ -3,25 +3,61 @@
 namespace ModSynth
 {
 
+Delay::Delay()
+{
+    delayLineLeft.push_back(0);
+    delayLineRight.push_back(0);
+}
+
+
+Delay::Delay(float delayTimeIn, float feedbackIn, float mixIn)
+    : delay_time(delayTimeIn), feedback(feedbackIn), mix(mixIn) 
+{
+    delayLineLeft.push_back(0);
+    delayLineRight.push_back(0);
+};
+
+Delay::Delay(float delayTimeIn, float feedbackIn, float mixIn, DelayMode modeIn)
+    : delay_time(delayTimeIn), feedback(feedbackIn), mix(mixIn), mode(modeIn) 
+{
+    delayLineLeft.push_back(0);
+    delayLineRight.push_back(0);
+};
+
 void Delay::update()
 {
-    delayLine.push_back(audio_in + feedback * prev_sample);
-    float audio_out = audio_in + delayLine.front();
-    prev_sample = audio_out;
-    if (delayLine.size() >= delay_time / dt)
-    {
-        delayLine.pop_front();
-    }
+    // read - the front() of each line is going to be 0 until enough samples come in to fill up the lines.
+    float leftRead = delayLineLeft.front();
+    float rightRead = delayLineRight.front();
+
+    // create input for the delay lines
+    float outLeft = audio_in_left * (1.0f - feedback) + leftRead * feedback;
+    float outRight = audio_in_right * (1.0f - feedback) + rightRead * feedback;
+
+    // write to the delay lines
     if (mode == DelayMode::STANDARD)
     {
-        audio_out_left = audio_out;
-        audio_out_right = audio_out;
+        delayLineLeft.push_back(outLeft);
+        delayLineRight.push_back(outRight);
     }
     else if (mode == DelayMode::PING_PONG)
-    {   
-        audio_out_left  = leftOrRight ? audio_out : audio_in;
-        audio_out_right = !leftOrRight ? audio_out : audio_in;
+    {
+        delayLineLeft.push_back(outRight);
+        delayLineRight.push_back(outLeft);
     }
+
+    if (delayLineLeft.size() >= delay_time / dt)
+    {
+        delayLineLeft.pop_front();
+    }
+    if (delayLineRight.size() >= (mode == DelayMode::PING_PONG ? stereo_ratio : 1.0f) * delay_time / dt)
+    {
+        delayLineRight.pop_front();
+    }
+
+    // form output
+    audio_out_left = (1.0f - mix) * audio_in_left + mix * outLeft;
+    audio_out_right = (1.0f - mix) * audio_in_right + mix * outRight;
 }
 
 };
